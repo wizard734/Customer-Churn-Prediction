@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Churn Analysis - Visualizations</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f8fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+            margin-top: 30px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            height: 100%;
+        }
+        .card-header {
+            background-color: #3c8dbc;
+            color: white;
+            font-weight: bold;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        .navbar {
+            background-color: #3c8dbc;
+            padding-top: 0.4rem;
+            padding-bottom: 0.4rem;
+        }
+        .navbar-brand, .nav-link {
+            color: white;
+        }
+        .nav-link:hover {
+            color: #f0f0f0;
+        }
+        .viz-img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .card-description {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .section-title {
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3c8dbc;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Customer Churn Prediction</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Prediction Tool</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/visualizations">Visualizations</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 class="section-title">Model Performance Visualizations</h2>
+        <div class="row">
+            {% for viz in visualizations %}
+            {% if viz.name in ['Confusion Matrix', 'ROC Curve', 'Feature Importance'] %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">{{ viz.name }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">{{ viz.description }}</p>
+                        <img src="{{ url_for('static', filename=viz.file) }}" class="viz-img" alt="{{ viz.name }}">
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <h2 class="section-title mt-5">Customer Demographics Analysis</h2>
+        <div class="row">
+            {% for viz in visualizations %}
+            {% if viz.name in ['Customer Distribution by Churn', 'Age Distribution by Churn', 'Contract Type vs Churn'] %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">{{ viz.name }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">{{ viz.description }}</p>
+                        <img src="{{ url_for('static', filename=viz.file) }}" class="viz-img" alt="{{ viz.name }}">
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <h2 class="section-title mt-5">Feature Relationship Analysis</h2>
+        <div class="row">
+            {% for viz in visualizations %}
+            {% if viz.name in ['Correlation Heatmap', 'Monthly Charges vs Churn', 'Usage Metrics vs Churn'] %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">{{ viz.name }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">{{ viz.description }}</p>
+                        <img src="{{ url_for('static', filename=viz.file) }}" class="viz-img" alt="{{ viz.name }}">
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <footer class="bg-light text-center text-muted py-4 mt-5">
+        <div class="container">
+            <p class="mb-0">Customer Churn Prediction Model - Machine Learning Project</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

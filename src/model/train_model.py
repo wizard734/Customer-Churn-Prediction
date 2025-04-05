@@ -93,7 +93,7 @@ def evaluate_model(model, X_test, y_test, feature_names=None):
     plt.title('Confusion Matrix')
     plt.ylabel('True Label')
     plt.xlabel('Predicted Label')
-    plt.savefig('confusion_matrix.png')
+    plt.savefig('static/confusion_matrix.png')
     
     # Plot ROC curve
     fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
@@ -104,7 +104,7 @@ def evaluate_model(model, X_test, y_test, feature_names=None):
     plt.ylabel('True Positive Rate')
     plt.title('ROC Curve')
     plt.legend(loc='lower right')
-    plt.savefig('roc_curve.png')
+    plt.savefig('static/roc_curve.png')
     
     # Feature importance (if feature names are provided)
     if feature_names is not None:
@@ -123,7 +123,95 @@ def evaluate_model(model, X_test, y_test, feature_names=None):
         sns.barplot(x='Importance', y='Feature', data=top_features)
         plt.title('Top 15 Features by Importance')
         plt.tight_layout()
-        plt.savefig('feature_importance.png')
+        plt.savefig('static/feature_importance.png')
+    
+    # Load original data for more visualizations
+    df = download_sample_data()
+    
+    # 1. Customer Distribution by Churn
+    plt.figure(figsize=(10, 6))
+    churn_counts = df['Churn'].value_counts()
+    ax = sns.countplot(x='Churn', data=df, palette=['green', 'red'])
+    plt.title('Customer Distribution by Churn Status')
+    plt.xlabel('Churn Status (0=No, 1=Yes)')
+    plt.ylabel('Number of Customers')
+    
+    # Add count labels on top of bars
+    for i, count in enumerate(churn_counts):
+        ax.text(i, count + 5, str(count), ha='center')
+    
+    plt.savefig('static/churn_distribution.png')
+    
+    # 2. Age Distribution by Churn
+    plt.figure(figsize=(12, 6))
+    sns.histplot(data=df, x='Age', hue='Churn', multiple='dodge', bins=10, 
+                palette=['green', 'red'], kde=True)
+    plt.title('Age Distribution by Churn Status')
+    plt.xlabel('Age')
+    plt.ylabel('Count')
+    plt.savefig('static/age_distribution.png')
+    
+    # 3. Contract Type vs Churn
+    plt.figure(figsize=(12, 6))
+    contract_churn = pd.crosstab(df['ContractType'], df['Churn'], normalize='index') * 100
+    contract_churn.plot(kind='bar', stacked=False, figsize=(10, 6))
+    plt.title('Churn Rate by Contract Type')
+    plt.xlabel('Contract Type')
+    plt.ylabel('Churn Rate (%)')
+    plt.legend(['Retained', 'Churned'])
+    plt.xticks(rotation=45)
+    plt.savefig('static/contract_churn.png')
+    
+    # 4. Correlation Heatmap
+    plt.figure(figsize=(14, 10))
+    # Convert categorical variables to numeric for correlation
+    df_numeric = df.copy()
+    
+    # One-hot encode categorical variables
+    for col in ['Gender', 'Location', 'ContractType']:
+        if col in df_numeric.columns:
+            dummies = pd.get_dummies(df_numeric[col], prefix=col, drop_first=False)
+            df_numeric = pd.concat([df_numeric.drop(col, axis=1), dummies], axis=1)
+    
+    # Calculate correlation
+    corr = df_numeric.corr()
+    mask = np.triu(np.ones_like(corr, dtype=bool))
+    sns.heatmap(corr, mask=mask, annot=True, fmt='.2f', cmap='coolwarm', square=True)
+    plt.title('Correlation Heatmap of Features')
+    plt.tight_layout()
+    plt.savefig('static/correlation_heatmap.png')
+    
+    # 5. Monthly Charges vs Churn
+    plt.figure(figsize=(10, 6))
+    sns.boxplot(x='Churn', y='MonthlyCharges', data=df, palette=['green', 'red'])
+    plt.title('Monthly Charges by Churn Status')
+    plt.xlabel('Churn Status (0=No, 1=Yes)')
+    plt.ylabel('Monthly Charges ($)')
+    plt.savefig('static/monthly_charges.png')
+    
+    # 6. Usage Metrics vs Churn
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+    
+    # Watch Time
+    sns.boxplot(x='Churn', y='WatchTime', data=df, palette=['green', 'red'], ax=axes[0])
+    axes[0].set_title('Watch Time by Churn Status')
+    axes[0].set_xlabel('Churn')
+    axes[0].set_ylabel('Watch Time (hours/week)')
+    
+    # Frequency
+    sns.boxplot(x='Churn', y='Frequency', data=df, palette=['green', 'red'], ax=axes[1])
+    axes[1].set_title('Usage Frequency by Churn Status')
+    axes[1].set_xlabel('Churn')
+    axes[1].set_ylabel('Usage Frequency (times/week)')
+    
+    # Session Duration
+    sns.boxplot(x='Churn', y='SessionDuration', data=df, palette=['green', 'red'], ax=axes[2])
+    axes[2].set_title('Session Duration by Churn Status')
+    axes[2].set_xlabel('Churn')
+    axes[2].set_ylabel('Session Duration (minutes)')
+    
+    plt.tight_layout()
+    plt.savefig('static/usage_metrics.png')
     
     return {
         'accuracy': accuracy,

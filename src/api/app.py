@@ -21,6 +21,19 @@ PREPROCESSOR_PATH = os.path.join(MODELS_DIR, 'preprocessor.pkl')
 print(f"Looking for model at: {MODEL_PATH}")
 print(f"Looking for preprocessor at: {PREPROCESSOR_PATH}")
 
+# List of visualizations for the dashboard
+VISUALIZATIONS = [
+    {'name': 'Confusion Matrix', 'file': 'confusion_matrix.png', 'description': 'Shows the model\'s accuracy in predicting true positives, true negatives, false positives, and false negatives.'},
+    {'name': 'ROC Curve', 'file': 'roc_curve.png', 'description': 'Shows the trade-off between sensitivity (TPR) and specificity (1-FPR) for different thresholds.'},
+    {'name': 'Feature Importance', 'file': 'feature_importance.png', 'description': 'Shows which features have the most influence on the model\'s predictions.'},
+    {'name': 'Customer Distribution by Churn', 'file': 'churn_distribution.png', 'description': 'Shows the balance between churned and non-churned customers in the dataset.'},
+    {'name': 'Age Distribution by Churn', 'file': 'age_distribution.png', 'description': 'Shows how customer age correlates with churn probability.'},
+    {'name': 'Contract Type vs Churn', 'file': 'contract_churn.png', 'description': 'Shows how different contract types affect churn rates.'},
+    {'name': 'Correlation Heatmap', 'file': 'correlation_heatmap.png', 'description': 'Visualizes the correlations between different customer features.'},
+    {'name': 'Monthly Charges vs Churn', 'file': 'monthly_charges.png', 'description': 'Shows how monthly subscription cost relates to churn.'},
+    {'name': 'Usage Metrics vs Churn', 'file': 'usage_metrics.png', 'description': 'Shows how different usage patterns relate to customer churn.'}
+]
+
 # Initialize with None, will load on first request
 model = None
 preprocessor = None
@@ -46,6 +59,18 @@ def load_model():
 def home():
     """Render the home page with the input form"""
     return render_template('index.html')
+
+@app.route('/visualizations')
+def visualizations():
+    """Render the visualizations dashboard"""
+    # Check if visualization files exist
+    existing_visualizations = []
+    for viz in VISUALIZATIONS:
+        file_path = os.path.join(app.static_folder, viz['file'])
+        if os.path.exists(file_path):
+            existing_visualizations.append(viz)
+    
+    return render_template('visualizations.html', visualizations=existing_visualizations)
 
 @app.route('/health', methods=['GET'])
 def health():
